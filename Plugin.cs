@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CompatibilityHighlighter
 {
-    [BepInPlugin("com.awnova.compatibilityhighlighter", "CompatibilityHighlighter", "1.0.0")]
+    [BepInPlugin("com.awnova.compatibilityhighlighter", "CompatibilityHighlighter", "1.1.0")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -17,6 +17,7 @@ namespace CompatibilityHighlighter
         internal static ConfigEntry<bool> SuppressDuringDrag;
         internal static ConfigEntry<bool> IncludeContainers;
         internal static ConfigEntry<Color> CompatibleColor;
+        internal static ConfigEntry<bool> RecolorSlotOutline;
 
         private void Awake()
         {
@@ -33,6 +34,9 @@ namespace CompatibilityHighlighter
             new ItemViewDragEndPatch().Enable();
             new ContainerSuppressionPatch().Enable();
             new HighlightColorPatch().Enable();
+            new SlotOutlineColorPatch().Enable();
+            new ItemUiContextRegisterViewPatch().Enable();
+            new ItemUiContextUnregisterViewPatch().Enable();
 
             LOG.LogInfo("CompatibilityHighlighter loaded.");
         }
@@ -60,6 +64,10 @@ namespace CompatibilityHighlighter
             CompatibleColor = Config.Bind(
                 "General", "Compatible Color", new Color(0.06f, 0.38f, 0.06f),
                 "Color used to highlight compatible items. Defaults to the same green EFT itself uses for a valid drag-and-drop placement (GridView.ValidMoveColor).");
+
+            RecolorSlotOutline = Config.Bind(
+                "General", "Recolor Equipment Slots", false,
+                "Recolor the game's native compatible-slot outline (shown on equipment/mod slots while the mod's hover preview is active) to match Compatible Color. Off keeps the game's default green outline.");
         }
     }
 }

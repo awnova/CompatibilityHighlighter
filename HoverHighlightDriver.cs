@@ -22,6 +22,8 @@ namespace CompatibilityHighlighter
 
         internal bool SessionActive => _forwardContext != null || _reverseTinted.Count > 0;
 
+        internal ItemContextClass ForwardContext => _forwardContext;
+
         private static bool FrozenForDrag => !Plugin.SuppressDuringDrag.Value;
 
         private void Awake()

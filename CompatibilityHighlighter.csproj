@@ -83,7 +83,9 @@
     <Compile Include="HoverHighlightDriver.cs" />
     <Compile Include="Patches\ContainerSuppressionPatch.cs" />
     <Compile Include="Patches\HighlightColorPatch.cs" />
+    <Compile Include="Patches\ItemUiContextDragMaskPatches.cs" />
     <Compile Include="Patches\ItemViewHoverPatches.cs" />
+    <Compile Include="Patches\SlotOutlineColorPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="ViewFields.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
