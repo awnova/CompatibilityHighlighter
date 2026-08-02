@@ -15,14 +15,15 @@ namespace CompatibilityHighlighter
 
         private ItemView _pendingView;
         private float _pendingSince;
-        private ItemContextClass _forwardContext;
+        private DragItemContext _forwardContext;
         private readonly List<ItemView> _reverseTinted = new List<ItemView>();
         private readonly List<RectTransform> _borderCells = new List<RectTransform>();
         private bool _dragActive;
+        private bool _sessionApplied;
 
         internal bool SessionActive => _forwardContext != null || _reverseTinted.Count > 0;
 
-        internal ItemContextClass ForwardContext => _forwardContext;
+        internal DragItemContext ForwardContext => _forwardContext;
 
         private static bool FrozenForDrag => !Plugin.SuppressDuringDrag.Value;
 
@@ -100,7 +101,7 @@ namespace CompatibilityHighlighter
 
         private void Update()
         {
-            if (_pendingView == null || _forwardContext != null)
+            if (_pendingView == null || _sessionApplied)
             {
                 return;
             }
@@ -119,6 +120,7 @@ namespace CompatibilityHighlighter
 
             try
             {
+                _sessionApplied = true;
                 HighlightForward(view);
                 HighlightReverse(view);
                 RebuildBorderOverlay();
@@ -126,6 +128,7 @@ namespace CompatibilityHighlighter
             catch (Exception e)
             {
                 Plugin.LOG.LogError($"Failed to apply hover highlight: {e}");
+                _pendingView = null;
                 ClearHighlight();
             }
         }
@@ -156,12 +159,12 @@ namespace CompatibilityHighlighter
         private void HighlightForward(ItemView view)
         {
             var ui = ItemUiContext.Instance;
-            if (ui == null)
+            if (ui == null || view.ItemContext == null)
             {
                 return;
             }
 
-            _forwardContext = new ItemContextClass(view.ItemContext, view.ItemRotation);
+            _forwardContext = new DragItemContext(view.ItemContext, view.ItemRotation);
             ui.RegisterView(_forwardContext);
         }
 
@@ -266,6 +269,8 @@ namespace CompatibilityHighlighter
 
         private void ClearHighlight()
         {
+            _sessionApplied = false;
+
             if (_forwardContext != null)
             {
                 try

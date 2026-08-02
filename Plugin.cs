@@ -2,15 +2,18 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using CompatibilityHighlighter.Patches;
+using SPT.Reflection.Patching;
 using UnityEngine;
 
 namespace CompatibilityHighlighter
 {
-    [BepInPlugin("com.awnova.compatibilityhighlighter", "CompatibilityHighlighter", "1.1.0")]
+    [BepInPlugin("com.awnova.compatibilityhighlighter", "CompatibilityHighlighter", "1.2.0")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public sealed class Plugin : BaseUnityPlugin
     {
         internal static ManualLogSource LOG;
+
+        private static int _failedPatches;
 
         internal static ConfigEntry<bool> Enabled;
         internal static ConfigEntry<float> HoverDelay;
@@ -28,17 +31,39 @@ namespace CompatibilityHighlighter
             gameObject.AddComponent<HoverHighlightDriver>();
             gameObject.AddComponent<CellBorderOverlay>();
 
-            new ItemViewHoverEnterPatch().Enable();
-            new ItemViewHoverExitPatch().Enable();
-            new ItemViewDragBeginPatch().Enable();
-            new ItemViewDragEndPatch().Enable();
-            new ContainerSuppressionPatch().Enable();
-            new HighlightColorPatch().Enable();
-            new SlotOutlineColorPatch().Enable();
-            new ItemUiContextRegisterViewPatch().Enable();
-            new ItemUiContextUnregisterViewPatch().Enable();
+            EnablePatchSafely(new ItemViewHoverEnterPatch(), "hover enter");
+            EnablePatchSafely(new ItemViewHoverExitPatch(), "hover exit");
+            EnablePatchSafely(new ItemViewDragBeginPatch(), "drag begin");
+            EnablePatchSafely(new ItemViewDragEndPatch(), "drag end");
+            EnablePatchSafely(new ContainerSuppressionPatch(), "container suppression");
+            EnablePatchSafely(new HighlightColorPatch(), "highlight color");
+            EnablePatchSafely(new SlotOutlineColorPatch(), "slot outline");
+            EnablePatchSafely(new ItemUiContextRegisterViewPatch(), "ItemUiContext register");
+            EnablePatchSafely(new ItemUiContextUnregisterViewPatch(), "ItemUiContext unregister");
 
-            LOG.LogInfo("CompatibilityHighlighter loaded.");
+            if (_failedPatches == 0)
+            {
+                LOG.LogInfo("CompatibilityHighlighter loaded.");
+            }
+            else
+            {
+                LOG.LogError($"CompatibilityHighlighter loaded, but {_failedPatches} patch(es) failed to apply. " +
+                             "The game version is most likely newer than this build - see the errors above.");
+            }
+        }
+
+        private static void EnablePatchSafely(ModulePatch patch, string name)
+        {
+            try
+            {
+                patch.Enable();
+                LOG.LogInfo($"Enabled {name} patch.");
+            }
+            catch (System.Exception ex)
+            {
+                _failedPatches++;
+                LOG.LogError($"Failed to enable {name} patch: {ex}");
+            }
         }
 
         private void BindConfig()

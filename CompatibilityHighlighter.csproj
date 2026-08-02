@@ -34,6 +34,7 @@
   <PropertyGroup>
     <SPTBaseDir Condition=" '$(SPTBaseDir)' == '' ">C:\SPT</SPTBaseDir>
     <BuildPluginDir>$(MSBuildProjectDirectory)\Build\BepInEx\plugins</BuildPluginDir>
+    <RuntimePluginDir>$(SPTBaseDir)\BepInEx\plugins</RuntimePluginDir>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
 
@@ -94,7 +95,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 
   <PropertyGroup>
-    <PostBuildEvent>if not exist "$(BuildPluginDir)" mkdir "$(BuildPluginDir)"
-copy "$(TargetPath)" "$(BuildPluginDir)\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>powershell -NoProfile -ExecutionPolicy Bypass -Command "New-Item -ItemType Directory -Force -Path '$(BuildPluginDir)' | Out-Null; New-Item -ItemType Directory -Force -Path '$(RuntimePluginDir)' | Out-Null; Copy-Item -Force '$(TargetPath)' '$(BuildPluginDir)\$(TargetFileName)'; Copy-Item -Force '$(TargetPath)' '$(RuntimePluginDir)\$(TargetFileName)'"</PostBuildEvent>
   </PropertyGroup>
 </Project>

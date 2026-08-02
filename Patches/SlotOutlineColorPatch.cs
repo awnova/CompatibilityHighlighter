@@ -21,7 +21,7 @@ namespace CompatibilityHighlighter.Patches
         private static readonly AccessTools.FieldRef<SlotView, Image> SelectedBorder =
             AccessTools.FieldRefAccess<SlotView, Image>("_selectedBorder");
 
-        private static readonly FieldInfo ValidColorField = AccessTools.Field(typeof(SlotView), "color_1");
+        private static readonly FieldInfo ValidColorField = AccessTools.Field(typeof(SlotView), "_validMoveColor");
 
         protected override MethodBase GetTargetMethod() =>
             AccessTools.Method(typeof(SlotView), "HighlightItemViewPosition");

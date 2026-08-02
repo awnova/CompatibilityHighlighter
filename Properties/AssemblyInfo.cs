@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("CompatibilityHighlighter")]
@@ -15,3 +16,5 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyMetadata("BepInExVersion", "5.4.23.5")]
+[assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
