@@ -23,11 +23,11 @@ namespace CompatibilityHighlighter.Patches
             AccessTools.Method(typeof(ItemUiContext), nameof(ItemUiContext.RegisterView));
 
         [PatchPostfix]
-        private static void Postfix(ItemContext itemContext, ref DragItemContext ___dragItemContext)
+        private static void Postfix(ItemContext itemContext, ref DragItemContext ____dragItemContext)
         {
             if (ReferenceEquals(itemContext, HoverHighlightDriver.Instance?.ForwardContext))
             {
-                ___dragItemContext = null;
+                ____dragItemContext = null;
             }
         }
     }
@@ -38,11 +38,11 @@ namespace CompatibilityHighlighter.Patches
             AccessTools.Method(typeof(ItemUiContext), nameof(ItemUiContext.UnregisterView));
 
         [PatchPrefix]
-        private static void Prefix(ItemContext itemContext, ref DragItemContext ___dragItemContext)
+        private static void Prefix(ItemContext itemContext, ref DragItemContext ____dragItemContext)
         {
             if (ReferenceEquals(itemContext, HoverHighlightDriver.Instance?.ForwardContext))
             {
-                ___dragItemContext = (DragItemContext)itemContext;
+                ____dragItemContext = (DragItemContext)itemContext;
             }
         }
     }
