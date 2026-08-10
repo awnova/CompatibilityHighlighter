@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace CompatibilityHighlighter
 {
-    [BepInPlugin("com.awnova.compatibilityhighlighter", "CompatibilityHighlighter", "1.2.0")]
+    [BepInPlugin("com.awnova.compatibilityhighlighter", "CompatibilityHighlighter", "1.2.1")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public sealed class Plugin : BaseUnityPlugin
     {
