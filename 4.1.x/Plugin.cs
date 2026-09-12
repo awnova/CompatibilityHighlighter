@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace CompatibilityHighlighter
 {
-    [BepInPlugin("com.awnova.compatibilityhighlighter", "CompatibilityHighlighter", "1.2.1")]
+    [BepInPlugin("com.awnova.compatibilityhighlighter", "CompatibilityHighlighter", "1.3.0")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -21,6 +21,7 @@ namespace CompatibilityHighlighter
         internal static ConfigEntry<bool> IncludeContainers;
         internal static ConfigEntry<Color> CompatibleColor;
         internal static ConfigEntry<bool> RecolorSlotOutline;
+        internal static ConfigEntry<bool> HighlightTraderInventory;
 
         private void Awake()
         {
@@ -93,6 +94,10 @@ namespace CompatibilityHighlighter
             RecolorSlotOutline = Config.Bind(
                 "General", "Recolor Equipment Slots", false,
                 "Recolor the game's native compatible-slot outline (shown on equipment/mod slots while the mod's hover preview is active) to match Compatible Color. Off keeps the game's default green outline.");
+
+            HighlightTraderInventory = Config.Bind(
+                "General", "Highlight Trader Inventory", false,
+                "Also trigger the hover highlight for items in a trader's sell screen. Trader stock can't be dragged, so only reverse highlighting (marking which of your own items/slots the hovered item fits) is shown - the game itself won't glow the trader's own slots for an item you don't own.");
         }
     }
 }

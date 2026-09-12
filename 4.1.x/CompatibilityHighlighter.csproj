@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SPTBaseDir Condition=" '$(SPTBaseDir)' == '' ">C:\SPT</SPTBaseDir>
+    <SPTBaseDir Condition=" '$(SPTBaseDir)' == '' ">D:\SPT</SPTBaseDir>
     <BuildPluginDir>$(MSBuildProjectDirectory)\Build\BepInEx\plugins</BuildPluginDir>
     <RuntimePluginDir>$(SPTBaseDir)\BepInEx\plugins</RuntimePluginDir>
     <RunPostBuildEvent>Always</RunPostBuildEvent>

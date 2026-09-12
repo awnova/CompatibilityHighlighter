@@ -54,7 +54,14 @@ namespace CompatibilityHighlighter
             }
 
             var context = view.ItemContext;
-            if (context == null || !context.DragAvailable || !context.IsPreviewHighlightAvailable)
+            if (context == null || !context.IsPreviewHighlightAvailable)
+            {
+                return;
+            }
+
+            var traderException = Plugin.HighlightTraderInventory.Value &&
+                                   context.ViewType == EItemViewType.TradingTrader;
+            if (!context.DragAvailable && !traderException)
             {
                 return;
             }
@@ -138,11 +145,6 @@ namespace CompatibilityHighlighter
             _borderCells.Clear();
 
             var views = GetAllItemViews();
-            if (views == null)
-            {
-                CellBorderOverlay.Clear();
-                return;
-            }
 
             foreach (var candidate in views)
             {
@@ -159,7 +161,7 @@ namespace CompatibilityHighlighter
         private void HighlightForward(ItemView view)
         {
             var ui = ItemUiContext.Instance;
-            if (ui == null || view.ItemContext == null)
+            if (ui == null || view.ItemContext == null || !view.ItemContext.DragAvailable)
             {
                 return;
             }
@@ -174,11 +176,6 @@ namespace CompatibilityHighlighter
             var acceptors = CollectAcceptors(hoveredItem, out var installed);
 
             var views = GetAllItemViews();
-            if (views == null)
-            {
-                return;
-            }
-
             var color = Plugin.CompatibleColor.Value;
 
             foreach (var candidate in views)
@@ -242,10 +239,34 @@ namespace CompatibilityHighlighter
             return acceptors;
         }
 
+        // ItemViews are split across two separate UI roots: CommonUI (raid/stash screens)
+        // and MenuUI (the trader's buy/sell screen), so both must be searched.
         private static ItemView[] GetAllItemViews()
         {
-            var ui = Singleton<CommonUI>.Instance;
-            return ui != null ? ui.GetComponentsInChildren<ItemView>(false) : null;
+            var commonUi = Singleton<CommonUI>.Instance;
+            var commonViews = commonUi != null
+                ? commonUi.GetComponentsInChildren<ItemView>(false)
+                : Array.Empty<ItemView>();
+
+            var menuUi = Singleton<MenuUI>.Instance;
+            var menuViews = menuUi != null
+                ? menuUi.GetComponentsInChildren<ItemView>(false)
+                : Array.Empty<ItemView>();
+
+            if (menuViews.Length == 0)
+            {
+                return commonViews;
+            }
+
+            if (commonViews.Length == 0)
+            {
+                return menuViews;
+            }
+
+            var combined = new ItemView[commonViews.Length + menuViews.Length];
+            commonViews.CopyTo(combined, 0);
+            menuViews.CopyTo(combined, commonViews.Length);
+            return combined;
         }
 
         private static bool FitsAny(List<InvContainer> acceptors, Item item)
