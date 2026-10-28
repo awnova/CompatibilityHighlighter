@@ -20,6 +20,7 @@ namespace CompatibilityHighlighter
         private readonly List<RectTransform> _borderCells = new List<RectTransform>();
         private bool _dragActive;
         private bool _sessionApplied;
+        private bool _loggedCompatibilityError;
 
         internal bool SessionActive => _forwardContext != null || _reverseTinted.Count > 0;
 
@@ -128,9 +129,10 @@ namespace CompatibilityHighlighter
             try
             {
                 _sessionApplied = true;
+                var views = GetAllItemViews();
                 HighlightForward(view);
-                HighlightReverse(view);
-                RebuildBorderOverlay();
+                HighlightReverse(view, views);
+                RebuildBorderOverlay(views);
             }
             catch (Exception e)
             {
@@ -140,11 +142,9 @@ namespace CompatibilityHighlighter
             }
         }
 
-        private void RebuildBorderOverlay()
+        private void RebuildBorderOverlay(ItemView[] views)
         {
             _borderCells.Clear();
-
-            var views = GetAllItemViews();
 
             foreach (var candidate in views)
             {
@@ -170,12 +170,14 @@ namespace CompatibilityHighlighter
             ui.RegisterView(_forwardContext);
         }
 
-        private void HighlightReverse(ItemView view)
+        private void HighlightReverse(ItemView view, ItemView[] views)
         {
             var hoveredItem = view.Item;
-            var acceptors = CollectAcceptors(hoveredItem, out var installed);
+            var acceptors = new List<InvContainer>();
+            var installed = new HashSet<Item>();
+            CollectAcceptors(hoveredItem, acceptors, installed);
 
-            var views = GetAllItemViews();
+            var candidateAcceptors = new List<InvContainer>();
             var color = Plugin.CompatibleColor.Value;
 
             foreach (var candidate in views)
@@ -200,7 +202,8 @@ namespace CompatibilityHighlighter
 
                 if (!fits)
                 {
-                    var candidateAcceptors = CollectAcceptors(item, out _);
+                    candidateAcceptors.Clear();
+                    CollectAcceptors(item, candidateAcceptors, null);
                     fits = candidateAcceptors.Count > 0 && FitsAny(candidateAcceptors, hoveredItem);
                 }
 
@@ -214,17 +217,14 @@ namespace CompatibilityHighlighter
             }
         }
 
-        private static List<InvContainer> CollectAcceptors(Item item, out HashSet<Item> installed)
+        private static void CollectAcceptors(Item item, List<InvContainer> acceptors, HashSet<Item> installed)
         {
-            var acceptors = new List<InvContainer>();
-            installed = new HashSet<Item>();
-
             if (item is CompoundItem compound)
             {
                 foreach (var slot in compound.AllSlots)
                 {
                     acceptors.Add(slot);
-                    if (slot.ContainedItem != null)
+                    if (installed != null && slot.ContainedItem != null)
                     {
                         installed.Add(slot.ContainedItem);
                     }
@@ -235,8 +235,6 @@ namespace CompatibilityHighlighter
             {
                 acceptors.Add(ammo.Cartridges);
             }
-
-            return acceptors;
         }
 
         // ItemViews are split across two separate UI roots: CommonUI (raid/stash screens)
@@ -269,7 +267,7 @@ namespace CompatibilityHighlighter
             return combined;
         }
 
-        private static bool FitsAny(List<InvContainer> acceptors, Item item)
+        private bool FitsAny(List<InvContainer> acceptors, Item item)
         {
             foreach (var acceptor in acceptors)
             {
@@ -280,8 +278,15 @@ namespace CompatibilityHighlighter
                         return true;
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    // A container that throws is skipped, but log it once per run so a
+                    // game update that breaks CheckCompatibility is visible.
+                    if (!_loggedCompatibilityError)
+                    {
+                        _loggedCompatibilityError = true;
+                        Plugin.LOG.LogWarning($"CheckCompatibility threw for {item}; skipping (further occurrences suppressed): {e}");
+                    }
                 }
             }
 

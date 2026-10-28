@@ -1,3 +1,4 @@
+using System;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -7,10 +8,14 @@ using UnityEngine;
 
 namespace CompatibilityHighlighter
 {
-    [BepInPlugin("com.awnova.compatibilityhighlighter", "CompatibilityHighlighter", "1.3.0")]
+    [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
     [BepInProcess("EscapeFromTarkov.exe")]
     public sealed class Plugin : BaseUnityPlugin
     {
+        internal const string PluginGuid = "com.awnova.compatibilityhighlighter";
+        internal const string PluginName = "CompatibilityHighlighter";
+        internal const string PluginVersion = "1.3.1";
+
         internal static ManualLogSource LOG;
 
         private static int _failedPatches;
@@ -29,18 +34,23 @@ namespace CompatibilityHighlighter
 
             BindConfig();
 
+            if (!ViewFields.Validate())
+            {
+                _failedPatches++;
+            }
+
             gameObject.AddComponent<HoverHighlightDriver>();
             gameObject.AddComponent<CellBorderOverlay>();
 
-            EnablePatchSafely(new ItemViewHoverEnterPatch(), "hover enter");
-            EnablePatchSafely(new ItemViewHoverExitPatch(), "hover exit");
-            EnablePatchSafely(new ItemViewDragBeginPatch(), "drag begin");
-            EnablePatchSafely(new ItemViewDragEndPatch(), "drag end");
-            EnablePatchSafely(new ContainerSuppressionPatch(), "container suppression");
-            EnablePatchSafely(new HighlightColorPatch(), "highlight color");
-            EnablePatchSafely(new SlotOutlineColorPatch(), "slot outline");
-            EnablePatchSafely(new ItemUiContextRegisterViewPatch(), "ItemUiContext register");
-            EnablePatchSafely(new ItemUiContextUnregisterViewPatch(), "ItemUiContext unregister");
+            EnablePatchSafely(() => new ItemViewHoverEnterPatch(), "hover enter");
+            EnablePatchSafely(() => new ItemViewHoverExitPatch(), "hover exit");
+            EnablePatchSafely(() => new ItemViewDragBeginPatch(), "drag begin");
+            EnablePatchSafely(() => new ItemViewDragEndPatch(), "drag end");
+            EnablePatchSafely(() => new ContainerSuppressionPatch(), "container suppression");
+            EnablePatchSafely(() => new HighlightColorPatch(), "highlight color");
+            EnablePatchSafely(() => new SlotOutlineColorPatch(), "slot outline");
+            EnablePatchSafely(() => new ItemUiContextRegisterViewPatch(), "ItemUiContext register");
+            EnablePatchSafely(() => new ItemUiContextUnregisterViewPatch(), "ItemUiContext unregister");
 
             if (_failedPatches == 0)
             {
@@ -53,14 +63,16 @@ namespace CompatibilityHighlighter
             }
         }
 
-        private static void EnablePatchSafely(ModulePatch patch, string name)
+        // The factory runs inside the try so a failing static initializer in a patch class
+        // (e.g. a renamed private field) is reported like any other patch failure.
+        private static void EnablePatchSafely(Func<ModulePatch> createPatch, string name)
         {
             try
             {
-                patch.Enable();
+                createPatch().Enable();
                 LOG.LogInfo($"Enabled {name} patch.");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 _failedPatches++;
                 LOG.LogError($"Failed to enable {name} patch: {ex}");

@@ -1,7 +1,8 @@
+using System;
+using System.Runtime.CompilerServices;
 using EFT.UI.DragAndDrop;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace CompatibilityHighlighter
 {
@@ -15,8 +16,21 @@ namespace CompatibilityHighlighter
         internal static readonly AccessTools.FieldRef<ItemView, bool> HighlightedGlobally =
             AccessTools.FieldRefAccess<ItemView, bool>("HighlightedGlobally");
 
-        internal static readonly AccessTools.FieldRef<ItemView, Image> ColorPanel =
-            AccessTools.FieldRefAccess<ItemView, Image>("ColorPanel");
+        // Calling this runs the FieldRefAccess lookups above (they throw if a field is
+        // missing), so a rename surfaces at startup instead of on the first hover.
+        internal static bool Validate()
+        {
+            try
+            {
+                RuntimeHelpers.RunClassConstructor(typeof(ViewFields).TypeHandle);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Plugin.LOG.LogError($"ItemView highlight fields could not be resolved: {ex}");
+                return false;
+            }
+        }
 
         internal static void ApplyHighlight(ItemView view, Color color)
         {

@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SPTBaseDir Condition=" '$(SPTBaseDir)' == '' ">D:\SPT</SPTBaseDir>
+    <SPTBaseDir Condition=" '$(SPTBaseDir)' == '' ">C:\SPT</SPTBaseDir>
     <BuildPluginDir>$(MSBuildProjectDirectory)\Build\BepInEx\plugins</BuildPluginDir>
     <RuntimePluginDir>$(SPTBaseDir)\BepInEx\plugins</RuntimePluginDir>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
@@ -41,41 +41,45 @@
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>$(SPTBaseDir)\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(SPTBaseDir)\EscapeFromTarkov_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>$(SPTBaseDir)\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Comfort">
       <HintPath>$(SPTBaseDir)\EscapeFromTarkov_Data\Managed\Comfort.dll</HintPath>
-    </Reference>
-    <Reference Include="Comfort.Unity">
-      <HintPath>$(SPTBaseDir)\EscapeFromTarkov_Data\Managed\Comfort.Unity.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Sirenix.Serialization">
       <HintPath>$(SPTBaseDir)\EscapeFromTarkov_Data\Managed\Sirenix.Serialization.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="spt-reflection">
       <HintPath>$(SPTBaseDir)\BepInEx\plugins\spt\spt-reflection.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="UnityEngine">
       <HintPath>$(SPTBaseDir)\EscapeFromTarkov_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(SPTBaseDir)\EscapeFromTarkov_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>$(SPTBaseDir)\EscapeFromTarkov_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(SPTBaseDir)\EscapeFromTarkov_Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule">
-      <HintPath>$(SPTBaseDir)\EscapeFromTarkov_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
 

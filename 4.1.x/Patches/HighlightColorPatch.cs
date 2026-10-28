@@ -24,7 +24,7 @@ namespace CompatibilityHighlighter.Patches
                 return;
             }
 
-            var panel = ViewFields.ColorPanel(__instance);
+            var panel = __instance.ColorPanel;
             if (panel == null)
             {
                 return;
