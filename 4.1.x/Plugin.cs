@@ -14,7 +14,7 @@ namespace CompatibilityHighlighter
     {
         internal const string PluginGuid = "com.awnova.compatibilityhighlighter";
         internal const string PluginName = "CompatibilityHighlighter";
-        internal const string PluginVersion = "1.3.1";
+        internal const string PluginVersion = "1.3.2";
 
         internal static ManualLogSource LOG;
 

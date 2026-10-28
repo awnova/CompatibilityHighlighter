@@ -14,11 +14,6 @@ namespace CompatibilityHighlighter.Patches
         [PatchPostfix]
         private static void Postfix(GridItemView __instance)
         {
-            if (Plugin.IncludeContainers.Value)
-            {
-                return;
-            }
-
             var driver = HoverHighlightDriver.Instance;
             if (driver == null || !driver.SessionActive)
             {
@@ -26,6 +21,19 @@ namespace CompatibilityHighlighter.Patches
             }
 
             if (!ViewFields.HighlightedGlobally(__instance))
+            {
+                return;
+            }
+
+            // The game's accept highlight ignores search state, which would reveal what an
+            // unsearched or unexamined item is. Suppressed regardless of IncludeContainers.
+            if (!ViewFields.IsRevealed(__instance))
+            {
+                ViewFields.ClearHighlight(__instance);
+                return;
+            }
+
+            if (Plugin.IncludeContainers.Value)
             {
                 return;
             }

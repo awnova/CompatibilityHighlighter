@@ -52,6 +52,13 @@ namespace CompatibilityHighlighter
                 return;
             }
 
+            // An unsearched or unexamined item's identity is hidden, so hovering it must not reveal
+            // what it fits.
+            if (!ViewFields.IsRevealed(view))
+            {
+                return;
+            }
+
             var context = view.ItemContext;
             if (context == null || !context.DragAvailable || !context.IsPreviewHighlightAvailable)
             {
@@ -180,7 +187,7 @@ namespace CompatibilityHighlighter
 
             foreach (var candidate in views)
             {
-                if (candidate == null || candidate == view)
+                if (candidate == null || candidate == view || !ViewFields.IsRevealed(candidate))
                 {
                     continue;
                 }

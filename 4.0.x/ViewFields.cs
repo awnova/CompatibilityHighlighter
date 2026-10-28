@@ -18,6 +18,10 @@ namespace CompatibilityHighlighter
         internal static readonly AccessTools.FieldRef<ItemView, Image> ColorPanel =
             AccessTools.FieldRefAccess<ItemView, Image>("ColorPanel");
 
+        // False while the game still hides the item's identity: not yet searched in a
+        // container, or searched but not yet examined.
+        internal static bool IsRevealed(ItemView view) => view.IsSearched && view.Examined;
+
         internal static void ApplyHighlight(ItemView view, Color color)
         {
             color.a = HighlightAlpha;
