@@ -173,6 +173,13 @@ namespace CompatibilityHighlighter
                 return;
             }
 
+            // DragItemContext's ctor reads Item.Parent, which throws for detached items
+            // (trader offers, previews, etc.) that have no CurrentAddress.
+            if (view.Item.CurrentAddress == null)
+            {
+                return;
+            }
+
             _forwardContext = new DragItemContext(view.ItemContext, view.ItemRotation);
             ui.RegisterView(_forwardContext);
         }
